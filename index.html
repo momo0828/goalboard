@@ -7,14 +7,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif; background: #0D0B1A; color: #E2E8F0; }
+        body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif; background: #F3F0FF; color: #333; }
 
         .app { display: flex; height: 100vh; overflow: hidden; }
 
         /* ── Sidebar ── */
         .sidebar {
             width: 80px;
-            background: #09071A;
+            background: #12082A;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -22,7 +22,6 @@
             box-shadow: 2px 0 24px rgba(124,58,237,0.3);
             z-index: 10;
             flex-shrink: 0;
-            border-right: 1px solid rgba(124,58,237,0.2);
         }
 
         .logo {
@@ -33,7 +32,7 @@
             letter-spacing: 1px;
             line-height: 1.3;
             margin-bottom: 24px;
-            text-shadow: 0 0 14px rgba(167,139,250,1), 0 0 28px rgba(124,58,237,0.5);
+            text-shadow: 0 0 14px rgba(167,139,250,1);
         }
 
         .tab-btn {
@@ -49,7 +48,7 @@
             justify-content: center;
             margin-bottom: 6px;
             transition: all 0.2s ease;
-            color: rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.3);
             font-size: 10px;
             gap: 4px;
         }
@@ -57,80 +56,94 @@
         .tab-btn.active {
             background: linear-gradient(135deg, #7C3AED, #3B82F6);
             color: white;
-            box-shadow: 0 0 24px rgba(124,58,237,0.8), 0 4px 12px rgba(59,130,246,0.4);
+            box-shadow: 0 0 20px rgba(124,58,237,0.7);
         }
 
         .tab-btn:hover:not(.active) {
-            background: rgba(124,58,237,0.18);
+            background: rgba(124,58,237,0.2);
             color: #C4B5FD;
         }
 
         .tab-icon { font-size: 22px; }
 
         /* ── Main ── */
-        .main { flex: 1; overflow-y: auto; padding: 24px 20px; background: #0D0B1A; }
+        .main { flex: 1; overflow-y: auto; padding: 20px; }
 
         .page { display: none; }
         .page.active { display: block; }
 
         .page-header {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            color: #E2E8F0;
-            margin-bottom: 18px;
+            color: #1E1235;
+            margin-bottom: 16px;
+        }
+
+        /* ── 2カラムグリッド ── */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
         /* ── Card ── */
         .card {
-            background: #161230;
+            background: white;
             border-radius: 18px;
-            padding: 20px;
+            padding: 18px;
             margin-bottom: 14px;
-            border: 1px solid rgba(124,58,237,0.22);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.05);
+            border: 1px solid rgba(124,58,237,0.1);
+            box-shadow: 0 2px 16px rgba(124,58,237,0.08);
         }
+        .card.no-mb { margin-bottom: 0; }
 
         .section-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
-            color: rgba(148,163,184,0.7);
+            color: #A78BFA;
             letter-spacing: 1px;
             text-transform: uppercase;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         /* ── Character ── */
         .char-card {
-            background: linear-gradient(135deg, #4C1D95, #1E3A8A);
+            background: linear-gradient(135deg, #4C1D95, #1E40AF);
             border-radius: 18px;
-            padding: 16px 20px;
+            padding: 14px 18px;
             display: flex;
             align-items: center;
             gap: 14px;
             margin-bottom: 14px;
-            box-shadow: 0 4px 32px rgba(124,58,237,0.5), 0 0 60px rgba(59,130,246,0.12);
-            border: 1px solid rgba(167,139,250,0.35);
+            box-shadow: 0 4px 24px rgba(124,58,237,0.35);
+            border: 1px solid rgba(167,139,250,0.25);
         }
 
-        .char-face { font-size: 44px; flex-shrink: 0; }
+        .char-face { font-size: 40px; flex-shrink: 0; }
 
         .char-bubble {
-            background: rgba(255,255,255,0.12);
-            border-radius: 12px;
-            padding: 10px 14px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 8px 12px;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             line-height: 1.55;
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         /* ── Chart ── */
+        .chart-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
         .chart-wrap {
             position: relative;
-            width: 180px;
-            height: 180px;
-            margin: 0 auto 18px;
+            width: 130px;
+            height: 130px;
+            flex-shrink: 0;
         }
 
         .chart-center {
@@ -141,121 +154,103 @@
             pointer-events: none;
         }
 
-        .chart-pct { font-size: 34px; font-weight: 900; color: #A78BFA; line-height: 1; text-shadow: 0 0 24px rgba(167,139,250,0.8), 0 0 48px rgba(124,58,237,0.4); }
-        .chart-lbl { font-size: 11px; color: #64748B; margin-top: 2px; }
+        .chart-pct { font-size: 26px; font-weight: 900; color: #7C3AED; line-height: 1; text-shadow: 0 0 16px rgba(124,58,237,0.4); }
+        .chart-lbl { font-size: 10px; color: #aaa; margin-top: 2px; }
 
-        /* ── Stats grid ── */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* ── Stats ── */
+        .stats-mini { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
         .stat-box {
-            background: #1E1840;
-            border-radius: 12px;
-            padding: 12px;
+            background: #F3F0FF;
+            border-radius: 10px;
+            padding: 10px;
             text-align: center;
-            border: 1px solid rgba(124,58,237,0.15);
+            border: 1px solid rgba(124,58,237,0.08);
         }
 
-        .stat-val { font-size: 26px; font-weight: 900; color: #A78BFA; line-height: 1; text-shadow: 0 0 16px rgba(167,139,250,0.6); }
-        .stat-lbl { font-size: 11px; color: #64748B; margin-top: 4px; }
+        .stat-val { font-size: 22px; font-weight: 900; color: #7C3AED; line-height: 1; }
+        .stat-lbl { font-size: 10px; color: #999; margin-top: 3px; }
 
-        /* ── Pace ── */
-        .pace-bar { height: 8px; background: rgba(124,58,237,0.15); border-radius: 4px; overflow: hidden; margin: 10px 0; }
-        .pace-fill { height: 100%; background: linear-gradient(90deg, #7C3AED, #3B82F6); border-radius: 4px; box-shadow: 0 0 12px rgba(124,58,237,0.8); }
+        /* ── Pace card ── */
+        .pace-status {
+            font-size: 18px;
+            font-weight: 900;
+            color: #1E1235;
+            margin-bottom: 6px;
+        }
+        .pace-sub { font-size: 12px; color: #888; line-height: 1.6; margin-bottom: 10px; }
 
+        .pace-bar { height: 6px; background: #EDE8FF; border-radius: 3px; overflow: hidden; margin: 8px 0; }
+        .pace-fill { height: 100%; background: linear-gradient(90deg, #7C3AED, #3B82F6); border-radius: 3px; box-shadow: 0 0 8px rgba(124,58,237,0.6); }
+
+        /* ── Breakdown ── */
         .breakdown-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 7px 0;
+            border-bottom: 1px solid #F5F3FF;
             font-size: 13px;
-            color: #CBD5E1;
+            color: #555;
         }
         .breakdown-row:last-child { border-bottom: none; }
-        .breakdown-val { font-weight: bold; color: #A78BFA; text-shadow: 0 0 10px rgba(167,139,250,0.4); }
+        .breakdown-val { font-weight: bold; color: #7C3AED; }
 
         /* ── Seminar items ── */
         .seminar-item {
             border-left: 3px solid #7C3AED;
-            padding: 12px 14px;
-            background: rgba(124,58,237,0.07);
-            border-radius: 0 12px 12px 0;
-            margin-bottom: 10px;
+            padding: 10px 12px;
+            background: #F8F5FF;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 8px;
         }
-        .seminar-item.upcoming { border-left-color: rgba(255,255,255,0.2); opacity: 0.7; }
-        .seminar-item.live-color { border-left-color: #3B82F6; background: rgba(59,130,246,0.07); }
+        .seminar-item.upcoming { border-left-color: #ccc; opacity: 0.75; }
+        .seminar-item.live-color { border-left-color: #3B82F6; background: #F0F4FF; }
 
-        .sem-name { font-weight: bold; font-size: 14px; color: #E2E8F0; }
-        .sem-date { font-size: 11px; color: #64748B; margin-top: 3px; }
-        .sem-stats { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
-        .sem-stat { font-size: 12px; color: #94A3B8; }
-        .sem-stat strong { color: #A78BFA; }
+        .sem-name { font-weight: bold; font-size: 13px; color: #1E1235; }
+        .sem-date { font-size: 11px; color: #888; margin-top: 2px; }
+        .sem-stats { display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
+        .sem-stat { font-size: 12px; color: #666; }
+        .sem-stat strong { color: #7C3AED; }
 
         /* ── Slots ── */
-        .slot-grid-header {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            text-align: center;
-            margin-bottom: 4px;
-        }
+        .slot-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; margin-bottom: 4px; }
         .slot-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 
         .slot-cell {
             text-align: center;
-            padding: 7px 2px;
-            border-radius: 8px;
-            font-size: 11px;
+            padding: 6px 2px;
+            border-radius: 7px;
+            font-size: 10px;
             font-weight: bold;
         }
-        .slot-cell.avail { background: rgba(124,58,237,0.2); color: #A78BFA; box-shadow: 0 0 8px rgba(124,58,237,0.25); }
-        .slot-cell.full  { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.2); }
-        .slot-cell.few   { background: rgba(251,176,66,0.15); color: #FBB042; }
+        .slot-cell.avail { background: #EDE8FF; color: #7C3AED; }
+        .slot-cell.full  { background: #F5F5F5; color: #ccc; }
+        .slot-cell.few   { background: #FFF4E0; color: #F09820; }
         .slot-cell.empty { background: transparent; }
 
-        .slots-summary {
-            display: flex;
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-        .slots-sum-box {
-            flex: 1;
-            background: #1E1840;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            border: 1px solid rgba(124,58,237,0.15);
-        }
-        .slots-sum-val { font-size: 28px; font-weight: 900; color: #A78BFA; text-shadow: 0 0 16px rgba(167,139,250,0.5); }
-        .slots-sum-lbl { font-size: 11px; color: #64748B; margin-top: 3px; }
+        .slots-summary { display: flex; gap: 10px; margin-bottom: 14px; }
+        .slots-sum-box { flex: 1; background: #F3F0FF; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(124,58,237,0.08); }
+        .slots-sum-val { font-size: 26px; font-weight: 900; color: #7C3AED; }
+        .slots-sum-lbl { font-size: 10px; color: #999; margin-top: 3px; }
 
         /* ── Ever ── */
-        .ever-big { text-align: center; padding: 16px 0; }
-        .ever-num { font-size: 72px; font-weight: 900; color: #A78BFA; line-height: 1; text-shadow: 0 0 32px rgba(167,139,250,0.7), 0 0 64px rgba(124,58,237,0.3); }
-        .ever-unit { font-size: 22px; color: #64748B; margin-left: 4px; }
-        .ever-sub { font-size: 13px; color: #64748B; margin-top: 8px; }
-        .ever-sub strong { color: #A78BFA; }
+        .ever-big { text-align: center; padding: 12px 0; }
+        .ever-num { font-size: 64px; font-weight: 900; color: #7C3AED; line-height: 1; text-shadow: 0 0 24px rgba(124,58,237,0.3); }
+        .ever-unit { font-size: 20px; color: #aaa; margin-left: 4px; }
+        .ever-sub { font-size: 13px; color: #888; margin-top: 6px; }
+        .ever-sub strong { color: #7C3AED; }
 
-        /* ── Responsive (mobile) ── */
+        /* ── Responsive ── */
         @media (max-width: 640px) {
             .app { flex-direction: column-reverse; }
-            .sidebar {
-                width: 100%;
-                height: 64px;
-                flex-direction: row;
-                justify-content: space-around;
-                align-items: center;
-                padding: 0 8px;
-                box-shadow: 0 -2px 24px rgba(124,58,237,0.35);
-                border-right: none;
-                border-top: 1px solid rgba(124,58,237,0.2);
-            }
+            .sidebar { width: 100%; height: 64px; flex-direction: row; justify-content: space-around; align-items: center; padding: 0 8px; box-shadow: 0 -2px 20px rgba(124,58,237,0.3); }
             .logo { display: none; }
-            .main { padding: 16px 14px 80px; }
+            .main { padding: 14px 12px 80px; }
             .tab-btn { width: 56px; height: 52px; margin-bottom: 0; font-size: 9px; }
-            .chart-wrap { width: 160px; height: 160px; }
-            .char-face { font-size: 36px; }
-            .char-bubble { font-size: 13px; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .chart-wrap { width: 110px; height: 110px; }
+            .char-face { font-size: 34px; }
         }
     </style>
 </head>
@@ -294,55 +289,59 @@
                 <div class="char-bubble" id="char-msg">Loading…</div>
             </div>
 
-            <div class="card">
-                <div class="section-title">今月の達成状況</div>
-                <div class="chart-wrap">
-                    <canvas id="progressChart"></canvas>
-                    <div class="chart-center">
-                        <div class="chart-pct" id="chart-pct">—</div>
-                        <div class="chart-lbl">達成率</div>
+            <!-- 2カラム：進捗 ＋ ペース -->
+            <div class="grid-2">
+                <div class="card no-mb">
+                    <div class="section-title">今月の進捗サマリー</div>
+                    <div class="chart-row">
+                        <div class="chart-wrap">
+                            <canvas id="progressChart"></canvas>
+                            <div class="chart-center">
+                                <div class="chart-pct" id="chart-pct">—</div>
+                                <div class="chart-lbl">達成率</div>
+                            </div>
+                        </div>
+                        <div class="stats-mini">
+                            <div class="stat-box">
+                                <div class="stat-val">187</div>
+                                <div class="stat-lbl">現在の実績</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val">300</div>
+                                <div class="stat-lbl">KGI目標</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val" id="stat-remaining">—</div>
+                                <div class="stat-lbl">残り必要数</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val" id="stat-days">—</div>
+                                <div class="stat-lbl">残り日数</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-val">187</div>
-                        <div class="stat-lbl">現在の予約数</div>
+
+                <div class="card no-mb">
+                    <div class="section-title">今月のペース</div>
+                    <div class="pace-status" id="pace-label">やや遅れぎみです</div>
+                    <div class="pace-sub" id="pace-desc">このペースだと目標達成が<br>厳しくなりそうです。</div>
+                    <div class="pace-bar">
+                        <div class="pace-fill" id="pace-fill" style="width:0%"></div>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-val">300</div>
-                        <div class="stat-lbl">今月の目標</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-val" id="stat-remaining">—</div>
-                        <div class="stat-lbl">残り件数</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-val" id="stat-days">—</div>
-                        <div class="stat-lbl">残り日数</div>
+                    <div style="font-size:12px;color:#999;margin-top:6px">
+                        必要ペース：<strong style="color:#7C3AED" id="daily-need">—</strong> 件/日
                     </div>
                 </div>
             </div>
 
+            <!-- 導線内訳 -->
             <div class="card">
-                <div class="section-title">ペース分析</div>
-                <div style="font-size:13px;color:#94A3B8;margin-bottom:6px">
-                    今のペースだと月末 <strong style="color:#A78BFA">195件</strong> 予測
-                    <span style="color:#F87171;font-size:12px;margin-left:4px">（目標まで105件不足）</span>
-                </div>
-                <div style="font-size:13px;color:#94A3B8">
-                    目標達成に必要なペース：<strong style="color:#A78BFA" id="daily-need">—</strong> 件/日
-                </div>
-                <div class="pace-bar">
-                    <div class="pace-fill" id="pace-fill" style="width:0%"></div>
-                </div>
-
-                <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06)">
-                    <div class="section-title">導線別内訳</div>
-                    <div class="breakdown-row"><span>直個別</span><span class="breakdown-val">82件</span></div>
-                    <div class="breakdown-row"><span>エバー</span><span class="breakdown-val">54件</span></div>
-                    <div class="breakdown-row"><span>セミナー</span><span class="breakdown-val">35件</span></div>
-                    <div class="breakdown-row"><span>ライブ</span><span class="breakdown-val">16件</span></div>
-                </div>
+                <div class="section-title">導線別内訳</div>
+                <div class="breakdown-row"><span>直個別</span><span class="breakdown-val">82件</span></div>
+                <div class="breakdown-row"><span>エバー</span><span class="breakdown-val">54件</span></div>
+                <div class="breakdown-row"><span>セミナー</span><span class="breakdown-val">35件</span></div>
+                <div class="breakdown-row"><span>ライブ</span><span class="breakdown-val">16件</span></div>
             </div>
         </div>
 
@@ -352,7 +351,6 @@
 
             <div class="card">
                 <div class="section-title">セミナー</div>
-
                 <div class="seminar-item">
                     <div class="sem-name">◯◯セミナー Vol.3</div>
                     <div class="sem-date">4月12日（土）✅ 終了</div>
@@ -362,7 +360,6 @@
                         <div class="sem-stat">個別予約 <strong>21件</strong></div>
                     </div>
                 </div>
-
                 <div class="seminar-item">
                     <div class="sem-name">◯◯セミナー Vol.4</div>
                     <div class="sem-date">4月20日（日）✅ 終了</div>
@@ -372,7 +369,6 @@
                         <div class="sem-stat">個別予約 <strong>14件</strong></div>
                     </div>
                 </div>
-
                 <div class="seminar-item upcoming">
                     <div class="sem-name">◯◯セミナー Vol.5</div>
                     <div class="sem-date">4月30日（水）📌 予定</div>
@@ -384,7 +380,6 @@
 
             <div class="card">
                 <div class="section-title">ライブ配信</div>
-
                 <div class="seminar-item live-color">
                     <div class="sem-name">◯◯ライブ #8</div>
                     <div class="sem-date">4月9日（水）✅ 終了</div>
@@ -393,7 +388,6 @@
                         <div class="sem-stat">個別予約 <strong>9件</strong></div>
                     </div>
                 </div>
-
                 <div class="seminar-item live-color">
                     <div class="sem-name">◯◯ライブ #9</div>
                     <div class="sem-date">4月23日（水）✅ 終了</div>
@@ -415,7 +409,7 @@
                     <div class="slots-sum-lbl">今月の残り空き</div>
                 </div>
                 <div class="slots-sum-box">
-                    <div class="slots-sum-val" style="color:#FBB042;text-shadow:0 0 16px rgba(251,176,66,0.5)">2</div>
+                    <div class="slots-sum-val" style="color:#F09820">2</div>
                     <div class="slots-sum-lbl">今週の残り空き</div>
                 </div>
                 <div class="slots-sum-box">
@@ -427,13 +421,13 @@
             <div class="card">
                 <div class="section-title">4月 空き枠カレンダー</div>
                 <div class="slot-grid-header">
-                    <div style="font-size:10px;color:#64748B">月</div>
-                    <div style="font-size:10px;color:#64748B">火</div>
-                    <div style="font-size:10px;color:#64748B">水</div>
-                    <div style="font-size:10px;color:#64748B">木</div>
-                    <div style="font-size:10px;color:#64748B">金</div>
-                    <div style="font-size:10px;color:#7F5AF0">土</div>
-                    <div style="font-size:10px;color:#7F5AF0">日</div>
+                    <div style="font-size:10px;color:#888">月</div>
+                    <div style="font-size:10px;color:#888">火</div>
+                    <div style="font-size:10px;color:#888">水</div>
+                    <div style="font-size:10px;color:#888">木</div>
+                    <div style="font-size:10px;color:#888">金</div>
+                    <div style="font-size:10px;color:#C4B5FD">土</div>
+                    <div style="font-size:10px;color:#C4B5FD">日</div>
                 </div>
                 <div class="slot-grid">
                     <div class="slot-cell empty"></div>
@@ -499,9 +493,9 @@
             <div class="card">
                 <div class="section-title">今週の個別予約数</div>
                 <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:14px">
-                    <div style="font-size:52px;font-weight:900;color:#A78BFA;line-height:1;text-shadow:0 0 20px rgba(167,139,250,0.6)">42</div>
-                    <div style="font-size:16px;color:#64748B;padding-bottom:8px">件</div>
-                    <div style="font-size:13px;color:#34D399;padding-bottom:10px;margin-left:4px">先週比 +7件 ↑</div>
+                    <div style="font-size:48px;font-weight:900;color:#7C3AED;line-height:1">42</div>
+                    <div style="font-size:15px;color:#aaa;padding-bottom:7px">件</div>
+                    <div style="font-size:13px;color:#3B82F6;padding-bottom:9px;margin-left:4px">先週比 +7件 ↑</div>
                 </div>
                 <div class="breakdown-row"><span>直個別</span><span class="breakdown-val">18件</span></div>
                 <div class="breakdown-row"><span>エバー</span><span class="breakdown-val">12件</span></div>
@@ -511,14 +505,14 @@
 
             <div class="card">
                 <div class="section-title">月間進捗（4月）</div>
-                <div style="font-size:13px;color:#94A3B8;margin-bottom:10px">
-                    187件 <span style="color:#64748B">／ 目標</span> 300件
-                    <strong style="color:#A78BFA;margin-left:8px">62%</strong>
+                <div style="font-size:13px;color:#555;margin-bottom:8px">
+                    187件 <span style="color:#aaa">／ 目標</span> 300件
+                    <strong style="color:#7C3AED;margin-left:8px">62%</strong>
                 </div>
                 <div class="pace-bar">
                     <div class="pace-fill" style="width:62%"></div>
                 </div>
-                <div style="font-size:12px;color:#64748B;margin-top:8px">残り113件・残り3日</div>
+                <div style="font-size:12px;color:#aaa;margin-top:8px">残り113件・残り3日</div>
             </div>
 
             <div class="card">
@@ -551,9 +545,9 @@
                         <div class="sem-stat">予約受付中 <strong>61名</strong></div>
                     </div>
                 </div>
-                <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,#4C1D95,#1E3A8A);border-radius:12px;color:white;font-size:14px;font-weight:bold;line-height:1.7;text-align:center;border:1px solid rgba(167,139,250,0.3);box-shadow:0 0 20px rgba(124,58,237,0.3)">
+                <div style="margin-top:12px;padding:14px;background:linear-gradient(135deg,#4C1D95,#1E40AF);border-radius:12px;color:white;font-size:13px;font-weight:bold;line-height:1.7;text-align:center">
                     明日からも頑張りましょう！🔥<br>
-                    <span style="font-size:12px;opacity:0.8">眠らないKGI番長より</span>
+                    <span style="font-size:11px;opacity:0.85">眠らないKGI番長より</span>
                 </div>
             </div>
         </div>
@@ -571,9 +565,7 @@ function getRemainingDays() {
     return last.getDate() - now.getDate();
 }
 
-function getRate() {
-    return Math.round((CURRENT / GOAL) * 100);
-}
+function getRate() { return Math.round((CURRENT / GOAL) * 100); }
 
 function getCharacter(rate, days) {
     if (rate >= 100) return { face: '🎉', msg: 'やったーーー！！目標達成！！チーム最高すぎる！！' };
@@ -581,7 +573,14 @@ function getCharacter(rate, days) {
     if (days <= 3)   return { face: '🔥', msg: `ラスト${days}日！全員で巻き返せ！！あと${GOAL - CURRENT}件！！` };
     if (rate >= 60)  return { face: '😤', msg: `残り${GOAL - CURRENT}件！まだいける！気合で取りにいこう！` };
     if (rate >= 40)  return { face: '😰', msg: `今日から全力！残り${days}日で${GOAL - CURRENT}件！やるしかない！` };
-    return { face: '🆘', msg: `ピンチ！！でも諦めんな！チーム一丸で巻き返そう！` };
+    return { face: '🆘', msg: 'ピンチ！！でも諦めんな！チーム一丸で巻き返そう！' };
+}
+
+function getPaceLabel(rate) {
+    if (rate >= 100) return ['目標達成！！', ''];
+    if (rate >= 85)  return ['順調です！', 'このままのペースで走り切ろう！'];
+    if (rate >= 60)  return ['やや遅れぎみです', 'このペースだと目標達成が\n厳しくなりそうです。'];
+    return ['かなり遅れています', '今すぐ施策を追加してください！'];
 }
 
 const days = getRemainingDays();
@@ -595,22 +594,26 @@ document.getElementById('stat-days').textContent = days;
 document.getElementById('daily-need').textContent = dailyNeed;
 document.getElementById('pace-fill').style.width = Math.min(rate, 100) + '%';
 
+const [paceLabel, paceDesc] = getPaceLabel(rate);
+document.getElementById('pace-label').textContent = paceLabel;
+document.getElementById('pace-desc').innerHTML = paceDesc.replace('\n', '<br>');
+
 const ch = getCharacter(rate, days);
 document.getElementById('char-face').textContent = ch.face;
 document.getElementById('char-msg').textContent = ch.msg;
 
-// ── Progress chart (gradient donut) ──
+// ── Progress chart ──
 const ctx = document.getElementById('progressChart').getContext('2d');
-const gradient = ctx.createLinearGradient(0, 0, 180, 180);
-gradient.addColorStop(0, '#7C3AED');
-gradient.addColorStop(1, '#3B82F6');
+const grad = ctx.createLinearGradient(0, 0, 130, 130);
+grad.addColorStop(0, '#7C3AED');
+grad.addColorStop(1, '#3B82F6');
 
 new Chart(ctx, {
     type: 'doughnut',
     data: {
         datasets: [{
             data: [CURRENT, remaining],
-            backgroundColor: [gradient, 'rgba(124,58,237,0.1)'],
+            backgroundColor: [grad, '#EDE8FF'],
             borderWidth: 0
         }]
     },
@@ -618,7 +621,7 @@ new Chart(ctx, {
         cutout: '76%',
         responsive: true,
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
-        animation: { animateRotate: true, duration: 1000 }
+        animation: { animateRotate: true, duration: 900 }
     }
 });
 
@@ -629,15 +632,8 @@ new Chart(document.getElementById('everChart').getContext('2d'), {
         labels: ['11月', '12月', '1月', '2月', '3月', '4月'],
         datasets: [{
             data: [38, 45, 52, 49, 61, 54],
-            backgroundColor: [
-                'rgba(124,58,237,0.4)',
-                'rgba(124,58,237,0.4)',
-                'rgba(124,58,237,0.4)',
-                'rgba(124,58,237,0.4)',
-                'rgba(124,58,237,0.4)',
-                'rgba(124,58,237,0.9)'
-            ],
-            borderRadius: 7,
+            backgroundColor: ['#C4B5FD','#C4B5FD','#C4B5FD','#C4B5FD','#C4B5FD','#7C3AED'],
+            borderRadius: 6,
             borderSkipped: false
         }]
     },
@@ -645,15 +641,8 @@ new Chart(document.getElementById('everChart').getContext('2d'), {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
-            y: {
-                beginAtZero: true,
-                grid: { color: 'rgba(255,255,255,0.05)' },
-                ticks: { font: { size: 11 }, color: '#64748B' }
-            },
-            x: {
-                grid: { display: false },
-                ticks: { font: { size: 11 }, color: '#64748B' }
-            }
+            y: { beginAtZero: true, grid: { color: '#F3F0FF' }, ticks: { font: { size: 11 }, color: '#aaa' } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#aaa' } }
         }
     }
 });
