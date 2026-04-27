@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOAL BOARD</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif; background: #f0f8f8; color: #333; }
+
+        .app { display: flex; height: 100vh; overflow: hidden; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 80px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 12px;
+            box-shadow: 2px 0 10px rgba(66,164,175,0.1);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 11px;
+            font-weight: 900;
+            color: #42A4AF;
+            text-align: center;
+            letter-spacing: 1px;
+            line-height: 1.3;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            transition: all 0.2s ease;
+            color: #bbb;
+            font-size: 10px;
+            gap: 4px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #42A4AF, #5DCDC4);
+            color: white;
+            box-shadow: 0 4px 12px rgba(66,164,175,0.35);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #f0fafa;
+            color: #42A4AF;
+        }
+
+        .tab-icon { font-size: 22px; }
+
+        /* ── Main ── */
+        .main { flex: 1; overflow-y: auto; padding: 24px 20px; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .page-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2a2a2a;
+            margin-bottom: 18px;
+        }
+
+        /* ── Card ── */
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 12px rgba(66,164,175,0.08);
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        /* ── Character ── */
+        .char-card {
+            background: linear-gradient(135deg, #42A4AF, #5DCDC4);
+            border-radius: 18px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 16px rgba(66,164,175,0.3);
+        }
+
+        .char-face { font-size: 44px; flex-shrink: 0; }
+
+        .char-bubble {
+            background: rgba(255,255,255,0.22);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.55;
+        }
+
+        /* ── Chart ── */
+        .chart-wrap {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 18px;
+        }
+
+        .chart-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .chart-pct { font-size: 34px; font-weight: 900; color: #42A4AF; line-height: 1; }
+        .chart-lbl { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+        /* ── Stats grid ── */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .stat-box {
+            background: #f4fbfb;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val { font-size: 26px; font-weight: 900; color: #42A4AF; line-height: 1; }
+        .stat-lbl { font-size: 11px; color: #999; margin-top: 4px; }
+
+        /* ── Pace ── */
+        .pace-bar { height: 8px; background: #e8f5f5; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+        .pace-fill { height: 100%; background: linear-gradient(90deg, #42A4AF, #5DCDC4); border-radius: 4px; }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+        }
+        .breakdown-row:last-child { border-bottom: none; }
+        .breakdown-val { font-weight: bold; color: #42A4AF; }
+
+        /* ── Seminar items ── */
+        .seminar-item {
+            border-left: 4px solid #42A4AF;
+            padding: 12px 14px;
+            background: #f7fbfb;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 10px;
+        }
+        .seminar-item.upcoming { border-left-color: #ccc; opacity: 0.75; }
+        .seminar-item.live-color { border-left-color: #5DCDC4; }
+
+        .sem-name { font-weight: bold; font-size: 14px; }
+        .sem-date { font-size: 11px; color: #888; margin-top: 3px; }
+        .sem-stats { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+        .sem-stat { font-size: 12px; color: #666; }
+        .sem-stat strong { color: #42A4AF; }
+
+        /* ── Slots ── */
+        .slot-grid-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .slot-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+        .slot-cell {
+            text-align: center;
+            padding: 7px 2px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .slot-cell.avail { background: #e4f5f5; color: #42A4AF; }
+        .slot-cell.full  { background: #f5f5f5; color: #ccc; }
+        .slot-cell.few   { background: #fff4e0; color: #f09820; }
+        .slot-cell.empty { background: transparent; }
+
+        .slots-summary {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .slots-sum-box {
+            flex: 1;
+            background: #f4fbfb;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        .slots-sum-val { font-size: 28px; font-weight: 900; color: #42A4AF; }
+        .slots-sum-lbl { font-size: 11px; color: #999; margin-top: 3px; }
+
+        /* ── Ever ── */
+        .ever-big { text-align: center; padding: 16px 0; }
+        .ever-num { font-size: 72px; font-weight: 900; color: #42A4AF; line-height: 1; }
+        .ever-unit { font-size: 22px; color: #aaa; margin-left: 4px; }
+        .ever-sub { font-size: 13px; color: #888; margin-top: 8px; }
+        .ever-sub strong { color: #42A4AF; }
+
+        /* ── Responsive (mobile) ── */
+        @media (max-width: 640px) {
+            .app { flex-direction: column-reverse; }
+            .sidebar {
+                width: 100%;
+                height: 64px;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                padding: 0 8px;
+                box-shadow: 0 -2px 10px rgba(66,164,175,0.1);
+            }
+            .logo { display: none; }
+            .main { padding: 16px 14px 80px; }
+            .tab-btn { width: 56px; height: 52px; margin-bottom: 0; font-size: 9px; }
+            .chart-wrap { width: 160px; height: 160px; }
+            .char-face { font-size: 36px; }
+            .char-bubble { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+
+    <!-- ═══ Sidebar ═══ -->
+    <nav class="sidebar">
+        <div class="logo">GOAL<br>BOARD</div>
+        <button class="tab-btn active" onclick="switchTab('koubetsu')" id="tab-koubetsu">
+            <span class="tab-icon">🎯</span><span>個別</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('calendar')" id="tab-calendar">
+            <span class="tab-icon">📅</span><span>施策</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('slots')" id="tab-slots">
+            <span class="tab-icon">📋</span><span>空き枠</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('ever')" id="tab-ever">
+            <span class="tab-icon">♾️</span><span>エバー</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('weekly')" id="tab-weekly">
+            <span class="tab-icon">📝</span><span>週次</span>
+        </button>
+    </nav>
+
+    <!-- ═══ Main ═══ -->
+    <main class="main">
+
+        <!-- ─ 個別 ─ -->
+        <div class="page active" id="page-koubetsu">
+            <div class="page-header">個別予約数</div>
+
+            <div class="char-card">
+                <div class="char-face" id="char-face">🔥</div>
+                <div class="char-bubble" id="char-msg">Loading…</div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">今月の達成状況</div>
+                <div class="chart-wrap">
+                    <canvas id="progressChart"></canvas>
+                    <div class="chart-center">
+                        <div class="chart-pct" id="chart-pct">—</div>
+                        <div class="chart-lbl">達成率</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-val">187</div>
+                        <div class="stat-lbl">現在の予約数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val">300</div>
+                        <div class="stat-lbl">今月の目標</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="stat-remaining">—</div>
+                        <div class="stat-lbl">残り件数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="stat-days">—</div>
+                        <div class="stat-lbl">残り日数</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">ペース分析</div>
+                <div style="font-size:13px;color:#555;margin-bottom:6px">
+                    今のペースだと月末 <strong style="color:#42A4AF">195件</strong> 予測
+                    <span style="color:#e05a5a;font-size:12px;margin-left:4px">（目標まで105件不足）</span>
+                </div>
+                <div style="font-size:13px;color:#555">
+                    目標達成に必要なペース：<strong style="color:#42A4AF" id="daily-need">—</strong> 件/日
+                </div>
+                <div class="pace-bar">
+                    <div class="pace-fill" id="pace-fill" style="width:0%"></div>
+                </div>
+
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f0f0f0">
+                    <div class="section-title">導線別内訳</div>
+                    <div class="breakdown-row"><span>直個別</span><span class="breakdown-val">82件</span></div>
+                    <div class="breakdown-row"><span>エバー</span><span class="breakdown-val">54件</span></div>
+                    <div class="breakdown-row"><span>セミナー</span><span class="breakdown-val">35件</span></div>
+                    <div class="breakdown-row"><span>ライブ</span><span class="breakdown-val">16件</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─ 施策 ─ -->
+        <div class="page" id="page-calendar">
+            <div class="page-header">今月の施策</div>
+
+            <div class="card">
+                <div class="section-title">セミナー</div>
+
+                <div class="seminar-item">
+                    <div class="sem-name">◯◯セミナー Vol.3</div>
+                    <div class="sem-date">4月12日（土）✅ 終了</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">予約 <strong>48名</strong></div>
+                        <div class="sem-stat">着席 <strong>32名</strong></div>
+                        <div class="sem-stat">個別予約 <strong>21件</strong></div>
+                    </div>
+                </div>
+
+                <div class="seminar-item">
+                    <div class="sem-name">◯◯セミナー Vol.4</div>
+                    <div class="sem-date">4月20日（日）✅ 終了</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">予約 <strong>52名</strong></div>
+                        <div class="sem-stat">着席 <strong>38名</strong></div>
+                        <div class="sem-stat">個別予約 <strong>14件</strong></div>
+                    </div>
+                </div>
+
+                <div class="seminar-item upcoming">
+                    <div class="sem-name">◯◯セミナー Vol.5</div>
+                    <div class="sem-date">4月30日（水）📌 予定</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">予約 <strong>61名</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">ライブ配信</div>
+
+                <div class="seminar-item live-color">
+                    <div class="sem-name">◯◯ライブ #8</div>
+                    <div class="sem-date">4月9日（水）✅ 終了</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">参加者 <strong>124名</strong></div>
+                        <div class="sem-stat">個別予約 <strong>9件</strong></div>
+                    </div>
+                </div>
+
+                <div class="seminar-item live-color">
+                    <div class="sem-name">◯◯ライブ #9</div>
+                    <div class="sem-date">4月23日（水）✅ 終了</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">参加者 <strong>98名</strong></div>
+                        <div class="sem-stat">個別予約 <strong>7件</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─ 空き枠 ─ -->
+        <div class="page" id="page-slots">
+            <div class="page-header">セールス空き枠</div>
+
+            <div class="slots-summary">
+                <div class="slots-sum-box">
+                    <div class="slots-sum-val">12</div>
+                    <div class="slots-sum-lbl">今月の残り空き</div>
+                </div>
+                <div class="slots-sum-box">
+                    <div class="slots-sum-val" style="color:#f09820">2</div>
+                    <div class="slots-sum-lbl">今週の残り空き</div>
+                </div>
+                <div class="slots-sum-box">
+                    <div class="slots-sum-val">5</div>
+                    <div class="slots-sum-lbl">来週の残り空き</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">4月 空き枠カレンダー</div>
+                <div class="slot-grid-header">
+                    <div style="font-size:10px;color:#888">月</div>
+                    <div style="font-size:10px;color:#888">火</div>
+                    <div style="font-size:10px;color:#888">水</div>
+                    <div style="font-size:10px;color:#888">木</div>
+                    <div style="font-size:10px;color:#888">金</div>
+                    <div style="font-size:10px;color:#e88">土</div>
+                    <div style="font-size:10px;color:#e88">日</div>
+                </div>
+                <div class="slot-grid">
+                    <!-- Week 1 -->
+                    <div class="slot-cell empty"></div>
+                    <div class="slot-cell full">1</div>
+                    <div class="slot-cell full">2</div>
+                    <div class="slot-cell avail">3枠</div>
+                    <div class="slot-cell avail">2枠</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <!-- Week 2 -->
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell avail">1枠</div>
+                    <div class="slot-cell few">残2</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <!-- Week 3 -->
+                    <div class="slot-cell avail">4枠</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell avail">2枠</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <!-- Week 4 -->
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell avail">3枠</div>
+                    <div class="slot-cell avail">2枠</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                    <div class="slot-cell full">満</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─ エバー ─ -->
+        <div class="page" id="page-ever">
+            <div class="page-header">エバー個別予約</div>
+
+            <div class="card" style="text-align:center">
+                <div class="section-title">今月のカウント</div>
+                <div class="ever-big">
+                    <span class="ever-num">54</span>
+                    <span class="ever-unit">件</span>
+                </div>
+                <div class="ever-sub">累計 <strong>1,248件</strong></div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">月別推移（過去6ヶ月）</div>
+                <canvas id="everChart" height="130"></canvas>
+            </div>
+        </div>
+
+        <!-- ─ 週次レポート ─ -->
+        <div class="page" id="page-weekly">
+            <div class="page-header">週次レポート</div>
+
+            <div class="char-card">
+                <div class="char-face">📝</div>
+                <div class="char-bubble">4月第4週のレポートです！来週も一緒に頑張りましょう！💪</div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">今週の個別予約数</div>
+                <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:14px">
+                    <div style="font-size:52px;font-weight:900;color:#42A4AF;line-height:1">42</div>
+                    <div style="font-size:16px;color:#aaa;padding-bottom:8px">件</div>
+                    <div style="font-size:13px;color:#55B9B1;padding-bottom:10px;margin-left:4px">先週比 +7件 ↑</div>
+                </div>
+                <div class="breakdown-row"><span>直個別</span><span class="breakdown-val">18件</span></div>
+                <div class="breakdown-row"><span>エバー</span><span class="breakdown-val">12件</span></div>
+                <div class="breakdown-row"><span>セミナー</span><span class="breakdown-val">8件</span></div>
+                <div class="breakdown-row"><span>ライブ</span><span class="breakdown-val">4件</span></div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">月間進捗（4月）</div>
+                <div style="font-size:13px;color:#555;margin-bottom:10px">
+                    187件 <span style="color:#aaa">／ 目標</span> 300件
+                    <strong style="color:#42A4AF;margin-left:8px">62%</strong>
+                </div>
+                <div class="pace-bar">
+                    <div class="pace-fill" style="width:62%"></div>
+                </div>
+                <div style="font-size:12px;color:#aaa;margin-top:8px">残り113件・残り3日</div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">今週の施策結果</div>
+                <div class="seminar-item">
+                    <div class="sem-name">◯◯セミナー Vol.4</div>
+                    <div class="sem-date">4月20日（日）</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">予約 <strong>52名</strong></div>
+                        <div class="sem-stat">着席 <strong>38名</strong></div>
+                        <div class="sem-stat">個別予約 <strong>14件</strong></div>
+                    </div>
+                </div>
+                <div class="seminar-item live-color">
+                    <div class="sem-name">◯◯ライブ #9</div>
+                    <div class="sem-date">4月23日（水）</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">参加者 <strong>98名</strong></div>
+                        <div class="sem-stat">個別予約 <strong>7件</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title">来週のスケジュール</div>
+                <div class="seminar-item upcoming" style="opacity:1;border-left-color:#42A4AF">
+                    <div class="sem-name">◯◯セミナー Vol.5</div>
+                    <div class="sem-date">4月30日（水）📌</div>
+                    <div class="sem-stats">
+                        <div class="sem-stat">予約受付中 <strong>61名</strong></div>
+                    </div>
+                </div>
+                <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,#42A4AF,#5DCDC4);border-radius:12px;color:white;font-size:14px;font-weight:bold;line-height:1.7;text-align:center">
+                    明日からも頑張りましょう！🔥<br>
+                    <span style="font-size:12px;opacity:0.85">眠らないKGI番長より</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+const GOAL = 300;
+const CURRENT = 187;
+
+function getRemainingDays() {
+    const now = new Date();
+    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return last.getDate() - now.getDate();
+}
+
+function getRate() {
+    return Math.round((CURRENT / GOAL) * 100);
+}
+
+function getCharacter(rate, days) {
+    if (rate >= 100) return { face: '🎉', msg: 'やったーーー！！目標達成！！チーム最高すぎる！！' };
+    if (rate >= 85)  return { face: '😊', msg: 'いいペース！あと少し！このまま走り切ろう！' };
+    if (days <= 3)   return { face: '🔥', msg: `ラスト${days}日！全員で巻き返せ！！あと${GOAL - CURRENT}件！！` };
+    if (rate >= 60)  return { face: '😤', msg: `残り${GOAL - CURRENT}件！まだいける！気合で取りにいこう！` };
+    if (rate >= 40)  return { face: '😰', msg: `今日から全力！残り${days}日で${GOAL - CURRENT}件！やるしかない！` };
+    return { face: '🆘', msg: `ピンチ！！でも諦めんな！チーム一丸で巻き返そう！` };
+}
+
+// ── Init ──
+const days = getRemainingDays();
+const rate = getRate();
+const remaining = GOAL - CURRENT;
+const dailyNeed = days > 0 ? Math.ceil(remaining / days) : '∞';
+
+document.getElementById('chart-pct').textContent = rate + '%';
+document.getElementById('stat-remaining').textContent = remaining;
+document.getElementById('stat-days').textContent = days;
+document.getElementById('daily-need').textContent = dailyNeed;
+document.getElementById('pace-fill').style.width = Math.min(rate, 100) + '%';
+
+const ch = getCharacter(rate, days);
+document.getElementById('char-face').textContent = ch.face;
+document.getElementById('char-msg').textContent = ch.msg;
+
+// ── Progress chart ──
+new Chart(document.getElementById('progressChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+        datasets: [{
+            data: [CURRENT, remaining],
+            backgroundColor: ['#42A4AF', '#e8f5f5'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        cutout: '74%',
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        animation: { animateRotate: true, duration: 900 }
+    }
+});
+
+// ── Ever bar chart ──
+new Chart(document.getElementById('everChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: ['11月', '12月', '1月', '2月', '3月', '4月'],
+        datasets: [{
+            data: [38, 45, 52, 49, 61, 54],
+            backgroundColor: ['#55B9B1','#55B9B1','#55B9B1','#55B9B1','#55B9B1','#42A4AF'],
+            borderRadius: 7,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: '#f0f5f5' }, ticks: { font: { size: 11 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+    }
+});
+
+// ── Tab switch ──
+function switchTab(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>
