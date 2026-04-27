@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif; background: #f0f8f8; color: #333; }
+        body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif; background: #f8f7ff; color: #333; }
 
         .app { display: flex; height: 100vh; overflow: hidden; }
 
@@ -19,7 +19,7 @@
             flex-direction: column;
             align-items: center;
             padding: 20px 0 12px;
-            box-shadow: 2px 0 10px rgba(66,164,175,0.1);
+            box-shadow: 2px 0 10px rgba(108,60,225,0.1);
             z-index: 10;
             flex-shrink: 0;
         }
@@ -27,7 +27,7 @@
         .logo {
             font-size: 11px;
             font-weight: 900;
-            color: #42A4AF;
+            color: #6C3CE1;
             text-align: center;
             letter-spacing: 1px;
             line-height: 1.3;
@@ -53,14 +53,14 @@
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, #42A4AF, #5DCDC4);
+            background: linear-gradient(135deg, #6C3CE1, #4A90E2);
             color: white;
-            box-shadow: 0 4px 12px rgba(66,164,175,0.35);
+            box-shadow: 0 4px 12px rgba(108,60,225,0.35);
         }
 
         .tab-btn:hover:not(.active) {
-            background: #f0fafa;
-            color: #42A4AF;
+            background: #f0eeff;
+            color: #6C3CE1;
         }
 
         .tab-icon { font-size: 22px; }
@@ -84,7 +84,7 @@
             border-radius: 18px;
             padding: 20px;
             margin-bottom: 14px;
-            box-shadow: 0 2px 12px rgba(66,164,175,0.08);
+            box-shadow: 0 2px 12px rgba(108,60,225,0.08);
         }
 
         .section-title {
@@ -98,14 +98,14 @@
 
         /* ── Character ── */
         .char-card {
-            background: linear-gradient(135deg, #42A4AF, #5DCDC4);
+            background: linear-gradient(135deg, #6C3CE1, #4A90E2);
             border-radius: 18px;
             padding: 16px 20px;
             display: flex;
             align-items: center;
             gap: 14px;
             margin-bottom: 14px;
-            box-shadow: 0 4px 16px rgba(66,164,175,0.3);
+            box-shadow: 0 4px 16px rgba(108,60,225,0.3);
         }
 
         .char-face { font-size: 44px; flex-shrink: 0; }
@@ -136,25 +136,25 @@
             pointer-events: none;
         }
 
-        .chart-pct { font-size: 34px; font-weight: 900; color: #42A4AF; line-height: 1; }
+        .chart-pct { font-size: 34px; font-weight: 900; color: #6C3CE1; line-height: 1; }
         .chart-lbl { font-size: 11px; color: #aaa; margin-top: 2px; }
 
         /* ── Stats grid ── */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         .stat-box {
-            background: #f4fbfb;
+            background: #f3f0ff;
             border-radius: 12px;
             padding: 12px;
             text-align: center;
         }
 
-        .stat-val { font-size: 26px; font-weight: 900; color: #42A4AF; line-height: 1; }
+        .stat-val { font-size: 26px; font-weight: 900; color: #6C3CE1; line-height: 1; }
         .stat-lbl { font-size: 11px; color: #999; margin-top: 4px; }
 
         /* ── Pace ── */
-        .pace-bar { height: 8px; background: #e8f5f5; border-radius: 4px; overflow: hidden; margin: 10px 0; }
-        .pace-fill { height: 100%; background: linear-gradient(90deg, #42A4AF, #5DCDC4); border-radius: 4px; }
+        .pace-bar { height: 8px; background: #ede8ff; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+        .pace-fill { height: 100%; background: linear-gradient(90deg, #6C3CE1, #4A90E2); border-radius: 4px; }
 
         .breakdown-row {
             display: flex;
@@ -165,24 +165,24 @@
             font-size: 13px;
         }
         .breakdown-row:last-child { border-bottom: none; }
-        .breakdown-val { font-weight: bold; color: #42A4AF; }
+        .breakdown-val { font-weight: bold; color: #6C3CE1; }
 
         /* ── Seminar items ── */
         .seminar-item {
-            border-left: 4px solid #42A4AF;
+            border-left: 4px solid #6C3CE1;
             padding: 12px 14px;
-            background: #f7fbfb;
+            background: #f5f2ff;
             border-radius: 0 12px 12px 0;
             margin-bottom: 10px;
         }
         .seminar-item.upcoming { border-left-color: #ccc; opacity: 0.75; }
-        .seminar-item.live-color { border-left-color: #5DCDC4; }
+        .seminar-item.live-color { border-left-color: #4A90E2; }
 
         .sem-name { font-weight: bold; font-size: 14px; }
         .sem-date { font-size: 11px; color: #888; margin-top: 3px; }
         .sem-stats { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
         .sem-stat { font-size: 12px; color: #666; }
-        .sem-stat strong { color: #42A4AF; }
+        .sem-stat strong { color: #6C3CE1; }
 
         /* ── Slots ── */
         .slot-grid-header {
@@ -201,7 +201,7 @@
             font-size: 11px;
             font-weight: bold;
         }
-        .slot-cell.avail { background: #e4f5f5; color: #42A4AF; }
+        .slot-cell.avail { background: #e8e0ff; color: #6C3CE1; }
         .slot-cell.full  { background: #f5f5f5; color: #ccc; }
         .slot-cell.few   { background: #fff4e0; color: #f09820; }
         .slot-cell.empty { background: transparent; }
@@ -213,20 +213,20 @@
         }
         .slots-sum-box {
             flex: 1;
-            background: #f4fbfb;
+            background: #f3f0ff;
             border-radius: 12px;
             padding: 12px;
             text-align: center;
         }
-        .slots-sum-val { font-size: 28px; font-weight: 900; color: #42A4AF; }
+        .slots-sum-val { font-size: 28px; font-weight: 900; color: #6C3CE1; }
         .slots-sum-lbl { font-size: 11px; color: #999; margin-top: 3px; }
 
         /* ── Ever ── */
         .ever-big { text-align: center; padding: 16px 0; }
-        .ever-num { font-size: 72px; font-weight: 900; color: #42A4AF; line-height: 1; }
+        .ever-num { font-size: 72px; font-weight: 900; color: #6C3CE1; line-height: 1; }
         .ever-unit { font-size: 22px; color: #aaa; margin-left: 4px; }
         .ever-sub { font-size: 13px; color: #888; margin-top: 8px; }
-        .ever-sub strong { color: #42A4AF; }
+        .ever-sub strong { color: #6C3CE1; }
 
         /* ── Responsive (mobile) ── */
         @media (max-width: 640px) {
@@ -238,7 +238,7 @@
                 justify-content: space-around;
                 align-items: center;
                 padding: 0 8px;
-                box-shadow: 0 -2px 10px rgba(66,164,175,0.1);
+                box-shadow: 0 -2px 10px rgba(108,60,225,0.1);
             }
             .logo { display: none; }
             .main { padding: 16px 14px 80px; }
@@ -316,11 +316,11 @@
             <div class="card">
                 <div class="section-title">ペース分析</div>
                 <div style="font-size:13px;color:#555;margin-bottom:6px">
-                    今のペースだと月末 <strong style="color:#42A4AF">195件</strong> 予測
+                    今のペースだと月末 <strong style="color:#6C3CE1">195件</strong> 予測
                     <span style="color:#e05a5a;font-size:12px;margin-left:4px">（目標まで105件不足）</span>
                 </div>
                 <div style="font-size:13px;color:#555">
-                    目標達成に必要なペース：<strong style="color:#42A4AF" id="daily-need">—</strong> 件/日
+                    目標達成に必要なペース：<strong style="color:#6C3CE1" id="daily-need">—</strong> 件/日
                 </div>
                 <div class="pace-bar">
                     <div class="pace-fill" id="pace-fill" style="width:0%"></div>
@@ -493,9 +493,9 @@
             <div class="card">
                 <div class="section-title">今週の個別予約数</div>
                 <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:14px">
-                    <div style="font-size:52px;font-weight:900;color:#42A4AF;line-height:1">42</div>
+                    <div style="font-size:52px;font-weight:900;color:#6C3CE1;line-height:1">42</div>
                     <div style="font-size:16px;color:#aaa;padding-bottom:8px">件</div>
-                    <div style="font-size:13px;color:#55B9B1;padding-bottom:10px;margin-left:4px">先週比 +7件 ↑</div>
+                    <div style="font-size:13px;color:#9B6BF2;padding-bottom:10px;margin-left:4px">先週比 +7件 ↑</div>
                 </div>
                 <div class="breakdown-row"><span>直個別</span><span class="breakdown-val">18件</span></div>
                 <div class="breakdown-row"><span>エバー</span><span class="breakdown-val">12件</span></div>
@@ -507,7 +507,7 @@
                 <div class="section-title">月間進捗（4月）</div>
                 <div style="font-size:13px;color:#555;margin-bottom:10px">
                     187件 <span style="color:#aaa">／ 目標</span> 300件
-                    <strong style="color:#42A4AF;margin-left:8px">62%</strong>
+                    <strong style="color:#6C3CE1;margin-left:8px">62%</strong>
                 </div>
                 <div class="pace-bar">
                     <div class="pace-fill" style="width:62%"></div>
@@ -538,14 +538,14 @@
 
             <div class="card">
                 <div class="section-title">来週のスケジュール</div>
-                <div class="seminar-item upcoming" style="opacity:1;border-left-color:#42A4AF">
+                <div class="seminar-item upcoming" style="opacity:1;border-left-color:#6C3CE1">
                     <div class="sem-name">◯◯セミナー Vol.5</div>
                     <div class="sem-date">4月30日（水）📌</div>
                     <div class="sem-stats">
                         <div class="sem-stat">予約受付中 <strong>61名</strong></div>
                     </div>
                 </div>
-                <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,#42A4AF,#5DCDC4);border-radius:12px;color:white;font-size:14px;font-weight:bold;line-height:1.7;text-align:center">
+                <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,#6C3CE1,#4A90E2);border-radius:12px;color:white;font-size:14px;font-weight:bold;line-height:1.7;text-align:center">
                     明日からも頑張りましょう！🔥<br>
                     <span style="font-size:12px;opacity:0.85">眠らないKGI番長より</span>
                 </div>
@@ -600,7 +600,7 @@ new Chart(document.getElementById('progressChart').getContext('2d'), {
     data: {
         datasets: [{
             data: [CURRENT, remaining],
-            backgroundColor: ['#42A4AF', '#e8f5f5'],
+            backgroundColor: ['#6C3CE1', '#ede8ff'],
             borderWidth: 0
         }]
     },
@@ -619,7 +619,7 @@ new Chart(document.getElementById('everChart').getContext('2d'), {
         labels: ['11月', '12月', '1月', '2月', '3月', '4月'],
         datasets: [{
             data: [38, 45, 52, 49, 61, 54],
-            backgroundColor: ['#55B9B1','#55B9B1','#55B9B1','#55B9B1','#55B9B1','#42A4AF'],
+            backgroundColor: ['#9B6BF2','#9B6BF2','#9B6BF2','#9B6BF2','#9B6BF2','#6C3CE1'],
             borderRadius: 7,
             borderSkipped: false
         }]
@@ -628,7 +628,7 @@ new Chart(document.getElementById('everChart').getContext('2d'), {
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
-            y: { beginAtZero: true, grid: { color: '#f0f5f5' }, ticks: { font: { size: 11 } } },
+            y: { beginAtZero: true, grid: { color: '#f0eeff' }, ticks: { font: { size: 11 } } },
             x: { grid: { display: false }, ticks: { font: { size: 11 } } }
         }
     }
